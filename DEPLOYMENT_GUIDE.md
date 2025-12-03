@@ -115,31 +115,45 @@ token = st.secrets["BASELINKER_TOKEN"]
 - Public by default (can set password in settings)
 - Sleeps after inactivity (wakes on first request)
 
-## 🔐 Making App Private
+## 🔐 Securing Your App (IMPORTANT!)
 
-### Streamlit Cloud:
-Settings → Secrets → Add password authentication
+### ✅ Password Protection (Built-in)
 
-### Docker/Self-hosted:
-Add basic auth:
-```python
-import streamlit as st
-import hmac
+The app now includes password protection. To enable:
 
-def check_password():
-    if "password_correct" not in st.session_state:
-        st.text_input("Password", type="password", on_change=password_entered, key="password")
-        return False
-    return st.session_state["password_correct"]
+**1. Streamlit Cloud:**
+- Go to your app dashboard
+- Click "⚙️ Settings" → "Secrets"
+- Add this secret:
+```toml
+password = "your_secure_password_here"
+```
+- Save and the app will restart
 
-def password_entered():
-    if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
-        st.session_state["password_correct"] = True
-    else:
-        st.session_state["password_correct"] = False
+**2. Local/Docker:**
+- Create/edit `.streamlit/secrets.toml`:
+```toml
+password = "your_secure_password_here"
+```
+- Restart the app
 
-if not check_password():
-    st.stop()
+**Note:** If no password is configured, the app allows access (for development).
+
+### Additional Security Options
+
+**Email Whitelist (Streamlit Cloud):**
+- Go to app Settings → "Sharing"
+- Enable "Restrict viewing to invited users only"
+- Add email addresses (requires Google sign-in)
+
+**IP Whitelist (Self-hosted):**
+- Use nginx/Apache to restrict by IP:
+```nginx
+location / {
+    allow 203.0.113.0/24;  # Your IP range
+    deny all;
+    proxy_pass http://localhost:8501;
+}
 ```
 
 ## 📊 Performance Tips

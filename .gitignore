@@ -23,7 +23,7 @@ wheels/
 .installed.cfg
 *.egg
 
-# Streamlit secrets only
+# Streamlit secrets (NEVER commit!)
 .streamlit/secrets.toml
 
 # Data files (but keep deployment files)
