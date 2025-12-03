@@ -335,21 +335,6 @@ def main():
     st.sidebar.markdown(f"**Description:** {config['description']}")
     st.sidebar.markdown(f"**Parser:** {config['parser']}")
     
-    # Filters
-    st.sidebar.subheader("Filters")
-    
-    filter_producer = st.sidebar.text_input(
-        "Filter by Producer",
-        help="Leave empty for all producers, or enter producer name"
-    )
-    
-    filter_min_stock = st.sidebar.number_input(
-        "Minimum Stock",
-        min_value=0,
-        value=0,
-        help="Only show products with stock >= this value"
-    )
-    
     # Main area
     col1, col2 = st.columns([2, 1])
     
@@ -371,13 +356,32 @@ def main():
             st.warning("⚠️ No products found in XML feed")
             return
         
+        # Get unique producers for dropdown
+        unique_producers = sorted(set(p['producer'] for p in products))
+        
+        # Filters in sidebar (after we have the products)
+        st.sidebar.subheader("Filters")
+        
+        filter_producer = st.sidebar.selectbox(
+            "Filter by Producer",
+            options=["All Producers"] + unique_producers,
+            help="Select a specific producer or view all"
+        )
+        
+        filter_min_stock = st.sidebar.number_input(
+            "Minimum Stock",
+            min_value=0,
+            value=0,
+            help="Only show products with stock >= this value"
+        )
+        
         # Apply filters
         filtered_products = products
         
-        if filter_producer:
+        if filter_producer != "All Producers":
             filtered_products = [
                 p for p in filtered_products 
-                if filter_producer.lower() in p['producer'].lower()
+                if p['producer'] == filter_producer
             ]
         
         if filter_min_stock > 0:
